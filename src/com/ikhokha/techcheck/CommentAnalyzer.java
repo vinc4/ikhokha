@@ -19,25 +19,62 @@ public class CommentAnalyzer {
 	public Map<String, Integer> analyze() {
 		
 		Map<String, Integer> resultsMap = new HashMap<>();
+                
+                //MATRICS NAMES TO BE ADDED BELOW Matric name and identifier
+                HashMap<String, String> MatricNamesAndIdentyfier = new HashMap<String,String>();
+		
+                MatricNamesAndIdentyfier.put("MOVER_MENTIONS", "Mover");
+                MatricNamesAndIdentyfier.put("SHAKER_MENTIONS", "Shaker");
+                MatricNamesAndIdentyfier.put("QUESTIONS", "?");
+                MatricNamesAndIdentyfier.put("SPAM ", "http");
+
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    
+                   
 			
 			String line = null;
 			while ((line = reader.readLine()) != null) {
-				
+                           
 				if (line.length() < 15) {
 					
 					incOccurrence(resultsMap, "SHORTER_THAN_15");
 
-				} else if (line.contains("Mover")) {
-
-					incOccurrence(resultsMap, "MOVER_MENTIONS");
-				
-				} else if (line.contains("Shaker")) {
-
-					incOccurrence(resultsMap, "SHAKER_MENTIONS");
-				
 				}
+                                
+                                for (Map.Entry<String, String> entry : MatricNamesAndIdentyfier.entrySet())
+                                {
+                                        //identityfier name
+                                        String identyfier_name = entry.getKey();
+                                        //identiryfier_characters
+                                        String identyfier_Characters = entry.getValue();
+                                        
+                                        //convert line to smaller letters
+                                        line = line.toLowerCase();
+                                        
+                                        //check if character appers twice
+                                        int count = 0;
+                                        if(identyfier_Characters.length() == 1)
+                                        {
+                                              count = line.length() - line.replace(identyfier_Characters, "").length();
+                                        }
+                                       
+  
+                                        identyfier_Characters = identyfier_Characters.toLowerCase();
+                                        
+                                        if(line.contains(identyfier_Characters))
+                                        {
+                                            if(count > 1 )
+                                            {
+                                                for (int i = 0; i < count; i++) {
+                                                     incOccurrence(resultsMap, identyfier_name);
+                                                }
+                                            }else{
+                                             incOccurrence(resultsMap, identyfier_name);
+                                            }
+                                           
+                                        }
+                                }
 			}
 			
 		} catch (FileNotFoundException e) {
@@ -62,5 +99,7 @@ public class CommentAnalyzer {
 		countMap.putIfAbsent(key, 0);
 		countMap.put(key, countMap.get(key) + 1);
 	}
+        
+       
 
 }
